@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Tree – Yadav Family</title>
+<link rel="stylesheet" href="style.css">
+<style>
+
+  body { background: linear-gradient(135deg, #f7f3ec 0%, #eaf0e4 100%); }
+
+  .page-header {
+    text-align: center;
+    padding: 44px 20px 6px;
+  }
+  .page-header h1 {
+    font-size: 2.2rem;
+    color: #3a2710;
+    margin: 0 0 6px;
+    letter-spacing: 1px;
+  }
+  .page-header p {
+    color: #8a7a68;
+    font-style: italic;
+    font-size: 1rem;
+    margin: 0 0 46px;
+  }
+
+  /* ── Tree container ── */
+  .ftree {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 60px;
+  }
+
+  /* ── Member card ── */
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 16px 14px;
+    width: 140px;
+    box-sizing: border-box;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(50,30,5,0.11);
+    border: 2px solid transparent;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+    user-select: none;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(50,30,5,0.18);
+    border-color: #c8a96e;
+  }
+
+  .avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #fff;
+  }
+  .m { background: linear-gradient(135deg, #5a9fd4, #2a6090); }
+  .f { background: linear-gradient(135deg, #d47a9a, #9a3d68); }
+
+  .card-name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #3a2710;
+    line-height: 1.3;
+  }
+  .card-role {
+    font-size: 0.66rem;
+    color: #a09080;
+    margin-top: 3px;
+  }
+
+  /* Grandfather card — slightly bigger */
+  .card.gf {
+    width: 160px;
+    padding: 24px 18px 16px;
+  }
+  .card.gf .avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 1.6rem;
+  }
+  .card.gf .card-name { font-size: 0.92rem; }
+
+  /* ── Connectors ── */
+  .stem  { width: 2px; height: 36px; background: #c8a96e; }
+  .vdrop { width: 2px; background: #c8a96e; }
+
+  .hbar-wrap {
+    display: flex;
+    /* width set inline to match card center-to-center span */
+  }
+  .hbar     { height: 2px; flex: 1; background: #c8a96e; }
+  .hbar-mid { width: 2px; height: 2px; background: #c8a96e; }
+
+  .drops {
+    display: flex;
+    justify-content: space-between;
+    /* width set inline to match hbar-wrap */
+  }
+  .drop { width: 2px; height: 30px; background: #c8a96e; }
+
+  /* ── Family units row (sons + wives) ── */
+  /*
+   *  card width  = 140px
+   *  gap between units = 48px
+   *  center-to-center (unit1 → unit3) = 2 × (140+48) = 376px
+   *  → hbar & drops width = 376px
+   */
+  .family-units {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .family-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 50px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: #7a6a58;
+  }
+  .leg-dot  { width: 12px; height: 12px; border-radius: 50%; }
+  .leg-line { width: 28px; height: 2px; background: #c8a96e; }
+</style>
+</head>
+<body>
+
+<nav>
+  <h2>Yadav Family</h2>
+  <ul>
+    <li><a href="family-tree.html">Family Tree</a></li>
+    <li><a href="members.html">Members</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <h1>Yadav Family Tree</h1>
+  <p>Roots that hold us &nbsp;·&nbsp; Branches that unite us</p>
+</div>
+
+<div class="ftree">
+
+  <!-- ══ Grandfather ══ -->
+  <div class="card gf">
+    <div class="avatar m">RP</div>
+    <div class="card-name">Ram Prasad Yadav</div>
+    <div class="card-role">Grandfather</div>
+  </div>
+
+  <!-- stem → hbar → 3 drops (376px center-to-center) -->
+  <div class="stem"></div>
+  <div class="hbar-wrap" style="width:376px;">
+    <div class="hbar"></div>
+    <div class="hbar-mid"></div>
+    <div class="hbar"></div>
+  </div>
+  <div class="drops" style="width:376px;">
+    <div class="drop"></div>
+    <div class="drop"></div>
+    <div class="drop"></div>
+  </div>
+
+  <!-- ══ Sons + Wives ══ -->
+  <div class="family-units">
+
+    <!-- Son 1 -->
+    <div class="family-unit">
+      <div class="card">
+        <div class="avatar m">R</div>
+        <div class="card-name">Ramesh Yadav</div>
+        <div class="card-role">Son</div>
+      </div>
+      <div class="vdrop" style="height:30px;"></div>
+      <div class="card">
+        <div class="avatar f">W</div>
+        <div class="card-name">Wife 1</div>
+        <div class="card-role">Daughter-in-law</div>
+      </div>
+    </div>
+
+    <!-- Son 2 -->
+    <div class="family-unit">
+      <div class="card">
+        <div class="avatar m">S</div>
+        <div class="card-name">Suresh Yadav</div>
+        <div class="card-role">Son</div>
+      </div>
+      <div class="vdrop" style="height:30px;"></div>
+      <div class="card">
+        <div class="avatar f">W</div>
+        <div class="card-name">Wife 2</div>
+        <div class="card-role">Daughter-in-law</div>
+      </div>
+    </div>
+
+    <!-- Son 3 -->
+    <div class="family-unit">
+      <div class="card">
+        <div class="avatar m">S</div>
+        <div class="card-name">Son 3</div>
+        <div class="card-role">Son</div>
+      </div>
+      <div class="vdrop" style="height:30px;"></div>
+      <div class="card">
+        <div class="avatar f">W</div>
+        <div class="card-name">Wife 3</div>
+        <div class="card-role">Daughter-in-law</div>
+      </div>
+    </div>
+
+  </div><!-- /family-units -->
+
+</div><!-- /ftree -->
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item">
+    <div class="leg-dot" style="background:linear-gradient(135deg,#5a9fd4,#2a6090);"></div>
+    Male
+  </div>
+  <div class="legend-item">
+    <div class="leg-dot" style="background:linear-gradient(135deg,#d47a9a,#9a3d68);"></div>
+    Female
+  </div>
+  <div class="legend-item">
+    <div class="leg-line"></div>
+    Family line
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

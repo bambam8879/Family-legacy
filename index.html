@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yadav Family Legacy</title>
+<link rel="stylesheet" href="style.css">
+<style>
+
+  body { background: linear-gradient(135deg, #f7f3ec 0%, #eaf0e4 100%); }
+
+  /* ── Hero ── */
+  .hero-banner {
+    background: linear-gradient(160deg, #3a2710 0%, #6a4a28 100%);
+    color: #fff;
+    padding: 0;
+  }
+  .hero-inner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 30px;
+  }
+  .hero-inner h1 { font-size: 1.3rem; margin: 0; letter-spacing: 1px; font-weight: 700; }
+  .hero-inner p  { display: none; }
+  .hero-inner nav { display: flex; gap: 22px; }
+  .hero-inner nav a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.88rem; transition: color .2s; }
+  .hero-inner nav a:hover { color: #c8a96e; }
+
+  /* ── Section heading ── */
+  .section-title { text-align: center; padding: 20px 20px 0; }
+  .section-title h2 { font-size: 1.6rem; color: #3a2710; margin: 0 0 4px; }
+  .section-title p  { color: #8a7a68; font-style: italic; font-size: 0.88rem; margin: 0 0 24px; }
+
+  /* ── Tree wrapper ── */
+  #ftree {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 40px 70px;
+    overflow: visible;
+  }
+
+  /* SVG connector overlay */
+  #tree-lines {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 4px 18px rgba(50,30,5,0.11);
+    border: 2px solid transparent;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+    user-select: none;
+    box-sizing: border-box;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(50,30,5,0.18);
+    border-color: #c8a96e;
+  }
+
+  .avatar {
+    border-radius: 50%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #fff;
+  }
+  .m { background: linear-gradient(135deg, #5a9fd4, #2a6090); }
+  .f { background: linear-gradient(135deg, #d47a9a, #9a3d68); }
+
+  .card-name { font-weight: 700; color: #3a2710; line-height: 1.3; }
+  .card-role { color: #a09080; margin-top: 3px; }
+  .card-nick { color: #3a2710; font-weight: 700; margin-top: 3px; font-size: 0.75rem; }
+
+  /* Grandparent cards */
+  .card.gp    { width: 148px; padding: 22px 16px 16px; }
+  .card.gp .avatar   { width: 60px; height: 60px; font-size: 1.5rem; margin-bottom: 10px; }
+  .card.gp .card-name{ font-size: 0.88rem; }
+  .card.gp .card-role{ font-size: 0.67rem; }
+
+  /* Son / Wife cards */
+  .card.son, .card.wife { width: 130px; padding: 18px 14px 14px; }
+  .card.son .avatar,
+  .card.wife .avatar   { width: 50px; height: 50px; font-size: 1.2rem; margin-bottom: 9px; }
+  .card.son .card-name,
+  .card.wife .card-name{ font-size: 0.82rem; }
+  .card.son .card-role,
+  .card.wife .card-role{ font-size: 0.64rem; }
+
+  /* Grandchild cards */
+  .card.kid    { width: 96px; padding: 14px 10px 11px; }
+  .card.kid .avatar   { width: 38px; height: 38px; font-size: 0.95rem; margin-bottom: 7px; }
+  .card.kid .card-name{ font-size: 0.75rem; }
+  .card.kid .card-role{ font-size: 0.6rem; }
+  .card.kid .card-nick{ font-size: 0.6rem; }
+
+  /* 4th-gen cards (inside family panels) */
+  .card.g4    { width: 100px; padding: 12px 8px 10px; }
+  .card.g4 .avatar   { width: 36px; height: 36px; font-size: 0.9rem; margin-bottom: 6px; }
+  .card.g4 .card-name{ font-size: 0.7rem; }
+  .card.g4 .card-role{ font-size: 0.58rem; }
+
+  /* ── Row layouts ── */
+  .gp-row, .son-couple {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .heart { font-size: 1rem; color: #c8a96e; }
+
+  .couple-bar {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 6px;
+  }
+  .couple-line { width: 18px; height: 2px; background: #c8a96e; }
+
+  .sons-row {
+    display: flex;
+    gap: 44px;
+    align-items: flex-start;
+    justify-content: center;
+    margin-top: 70px;
+  }
+
+  .branch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .kids-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 60px;
+    align-items: flex-start;
+  }
+
+  /* ── Kid column ── */
+  .kid-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ── Expand button ── */
+  .expand-btn {
+    background: none;
+    border: 1.5px solid #c8a96e;
+    color: #c8a96e;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .expand-btn:hover, .expand-btn.active {
+    background: #c8a96e;
+    color: #fff;
+  }
+
+  /* ── Family panel (inline expand) ── */
+  .family-panel {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin-top: 2px;
+  }
+  .family-panel.open { display: flex; }
+
+  .fp-vline      { width: 2px; height: 14px; background: #c8a96e; }
+  .fp-inner-vline{ width: 2px; height: 12px; background: #c8a96e; margin: 0 auto; }
+
+  .fp-inner {
+    background: rgba(255,255,255,0.8);
+    border: 1.5px solid #e0cdb0;
+    border-radius: 14px;
+    padding: 12px 12px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    box-shadow: 0 4px 16px rgba(50,30,5,0.09);
+  }
+
+  .fp-couple-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: nowrap;
+  }
+
+  .fp-kids-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 0;
+  }
+
+  /* ── Lightbox ── */
+  #lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    cursor: zoom-out;
+  }
+  #lightbox.open { display: flex; }
+  #lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    object-fit: contain;
+  }
+  #lightbox .lb-name {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: rgba(0,0,0,0.5);
+    padding: 6px 20px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  #lightbox .lb-close {
+    position: fixed;
+    top: 20px;
+    right: 28px;
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.8;
+  }
+  #lightbox .lb-close:hover { opacity: 1; }
+  img.avatar { cursor: zoom-in; }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 50px;
+    flex-wrap: wrap;
+    padding-bottom: 20px;
+  }
+  .legend-item { display:flex; align-items:center; gap:8px; font-size:.78rem; color:#7a6a58; }
+  .leg-dot  { width:12px; height:12px; border-radius:50%; }
+  .leg-line { width:28px; height:2px; background:#c8a96e; }
+</style>
+</head>
+<body>
+
+<!-- Unified Hero -->
+<section class="hero-banner">
+  <div class="hero-inner">
+    <h1>Yadav Family Legacy</h1>
+    <p>Our family originates from Jaunpur, Uttar Pradesh. This website documents our roots, traditions, and memories.</p>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="members.html">Members</a>
+      <a href="gallery.html">Gallery</a>
+    </nav>
+  </div>
+</section>
+
+<!-- Family Tree -->
+<div class="section-title">
+  <h2>Family Tree</h2>
+  <p>Roots that hold us &nbsp;·&nbsp; Branches that unite us</p>
+</div>
+
+<div id="ftree">
+
+  <!-- SVG overlay – lines drawn by JS -->
+  <svg id="tree-lines"></svg>
+
+  <!-- ══ Grandparents ══ -->
+  <div class="gp-row">
+    <div class="card gp" id="gp-m">
+      <div class="avatar m">RN</div>
+      <div class="card-name">Ramnaresh Yadav</div>
+      <div class="card-role">Grandfather</div>
+    </div>
+    <div class="couple-bar"><div class="couple-line"></div><span class="heart">&#10084;</span><div class="couple-line"></div></div>
+    <div class="card gp" id="gp-f">
+      <div class="avatar f">JD</div>
+      <div class="card-name">Jayraji Devi Yadav</div>
+      <div class="card-role">Grandmother</div>
+    </div>
+  </div>
+
+  <!-- ══ Sons + their kids ══ -->
+  <div class="sons-row">
+
+    <!-- ── Branch 1: Jungbahadur + Vidyadevi ── -->
+    <div class="branch">
+      <div class="son-couple">
+        <div class="card son" id="son-1">
+          <div class="avatar m">JY</div>
+          <div class="card-name">Jungbahadur Yadav</div>
+          <div class="card-role">Son</div>
+        </div>
+        <div class="couple-bar"><div class="couple-line"></div><span class="heart">&#10084;</span><div class="couple-line"></div></div>
+        <div class="card wife" id="wife-1">
+          <div class="avatar f">VY</div>
+          <div class="card-name">Vidyadevi Yadav</div>
+          <div class="card-role">Daughter-in-law</div>
+        </div>
+      </div>
+      <div class="kids-row">
+
+        <!-- Durgesh – no family listed -->
+        <div class="kid-col">
+          <div class="card kid" id="kid-1-1">
+            <img class="avatar" src="image.jpg/durgesh.jpg" style="object-fit:cover;" alt="Durgesh">
+            <div class="card-name">Durgesh Yadav</div>
+            <div class="card-nick">(Bambam)</div>
+          </div>
+        </div>
+
+        <!-- Gudiya – husband + son + daughter -->
+        <div class="kid-col">
+          <div class="card kid" id="kid-1-2">
+            <div class="avatar f">GY</div>
+            <div class="card-name">Gudiya Yadav</div>
+            <div class="card-role">Grandchild</div>
+          </div>
+          <button class="expand-btn" onclick="toggleFamily('fam-gudiya', this)">&#9660; Family</button>
+          <div class="family-panel" id="fam-gudiya">
+            <div class="fp-vline"></div>
+            <div class="fp-inner">
+              <div class="fp-couple-row">
+                <div class="card g4">
+                  <div class="avatar f">GY</div>
+                  <div class="card-name">Gudiya Yadav</div>
+                  <div class="card-role">Grandchild</div>
+                </div>
+                <div class="couple-bar"><div class="couple-line"></div><span class="heart" style="font-size:.85rem;">&#10084;</span><div class="couple-line"></div></div>
+                <div class="card g4">
+                  <div class="avatar m">H</div>
+                  <div class="card-name">Husband</div>
+                  <div class="card-role">Son-in-law</div>
+                </div>
+              </div>
+              <div class="fp-inner-vline"></div>
+              <div class="fp-kids-row">
+                <div class="card g4">
+                  <div class="avatar m">S</div>
+                  <div class="card-name">Son</div>
+                  <div class="card-role">4th Gen</div>
+                </div>
+                <div class="card g4">
+                  <div class="avatar f">D</div>
+                  <div class="card-name">Daughter</div>
+                  <div class="card-role">4th Gen</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /branch-1 -->
+
+    <!-- ── Branch 2: Shyambahadur + Shail ── -->
+    <div class="branch">
+      <div class="son-couple">
+        <div class="card son" id="son-2">
+          <div class="avatar m">SY</div>
+          <div class="card-name">Shyambahadur Yadav</div>
+          <div class="card-role">Son</div>
+        </div>
+        <div class="couple-bar"><div class="couple-line"></div><span class="heart">&#10084;</span><div class="couple-line"></div></div>
+        <div class="card wife" id="wife-2">
+          <div class="avatar f">SY</div>
+          <div class="card-name">Shail Yadav</div>
+          <div class="card-role">Daughter-in-law</div>
+        </div>
+      </div>
+      <div class="kids-row">
+
+        <!-- Ramchandra – wife + daughter -->
+        <div class="kid-col">
+          <div class="card kid" id="kid-2-1">
+            <div class="avatar m">RC</div>
+            <div class="card-name">Ramchandra Yadav</div>
+            <div class="card-nick">(Sonu)</div>
+          </div>
+          <button class="expand-btn" onclick="toggleFamily('fam-ramchandra', this)">&#9660; Family</button>
+          <div class="family-panel" id="fam-ramchandra">
+            <div class="fp-vline"></div>
+            <div class="fp-inner">
+              <div class="fp-couple-row">
+                <div class="card g4">
+                  <div class="avatar m">RC</div>
+                  <div class="card-name">Ramchandra Yadav</div>
+                  <div class="card-role">Grandchild</div>
+                </div>
+                <div class="couple-bar"><div class="couple-line"></div><span class="heart" style="font-size:.85rem;">&#10084;</span><div class="couple-line"></div></div>
+                <div class="card g4">
+                  <div class="avatar f">W</div>
+                  <div class="card-name">Wife</div>
+                  <div class="card-role">Daughter-in-law</div>
+                </div>
+              </div>
+              <div class="fp-inner-vline"></div>
+              <div class="fp-kids-row">
+                <div class="card g4">
+                  <div class="avatar f">D</div>
+                  <div class="card-name">Daughter</div>
+                  <div class="card-role">4th Gen</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pooja – husband + son -->
+        <div class="kid-col">
+          <div class="card kid" id="kid-2-2">
+            <div class="avatar f">PY</div>
+            <div class="card-name">Pooja Yadav</div>
+            <div class="card-role">Grandchild</div>
+          </div>
+          <button class="expand-btn" onclick="toggleFamily('fam-pooja', this)">&#9660; Family</button>
+          <div class="family-panel" id="fam-pooja">
+            <div class="fp-vline"></div>
+            <div class="fp-inner">
+              <div class="fp-couple-row">
+                <div class="card g4">
+                  <div class="avatar f">PY</div>
+                  <div class="card-name">Pooja Yadav</div>
+                  <div class="card-role">Grandchild</div>
+                </div>
+                <div class="couple-bar"><div class="couple-line"></div><span class="heart" style="font-size:.85rem;">&#10084;</span><div class="couple-line"></div></div>
+                <div class="card g4">
+                  <div class="avatar m">H</div>
+                  <div class="card-name">Husband</div>
+                  <div class="card-role">Son-in-law</div>
+                </div>
+              </div>
+              <div class="fp-inner-vline"></div>
+              <div class="fp-kids-row">
+                <div class="card g4">
+                  <div class="avatar m">S</div>
+                  <div class="card-name">Son</div>
+                  <div class="card-role">4th Gen</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Saurabh – wife only -->
+        <div class="kid-col">
+          <div class="card kid" id="kid-2-3">
+            <img class="avatar" src="image.jpg/saurabh.jpg" style="object-fit:cover;" alt="Saurabh">
+            <div class="card-name">Saurabh Yadav</div>
+            <div class="card-nick">(Dabuu)</div>
+          </div>
+          <button class="expand-btn" onclick="toggleFamily('fam-saurabh', this)">&#9660; Family</button>
+          <div class="family-panel" id="fam-saurabh">
+            <div class="fp-vline"></div>
+            <div class="fp-inner">
+              <div class="fp-couple-row">
+                <div class="card g4">
+                  <img class="avatar" src="image.jpg/saurabh.jpg" style="object-fit:cover;" alt="Saurabh">
+                  <div class="card-name">Saurabh Yadav</div>
+                  <div class="card-role">Grandchild</div>
+                </div>
+                <div class="couple-bar"><div class="couple-line"></div><span class="heart" style="font-size:.85rem;">&#10084;</span><div class="couple-line"></div></div>
+                <div class="card g4">
+                  <div class="avatar f">W</div>
+                  <div class="card-name">Wife</div>
+                  <div class="card-role">Daughter-in-law</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /branch-2 -->
+
+    <!-- ── Branch 3: Lalbahadur + Parmila ── -->
+    <div class="branch">
+      <div class="son-couple">
+        <div class="card son" id="son-3">
+          <div class="avatar m">LY</div>
+          <div class="card-name">Lalbahadur Yadav</div>
+          <div class="card-role">Son</div>
+        </div>
+        <div class="couple-bar"><div class="couple-line"></div><span class="heart">&#10084;</span><div class="couple-line"></div></div>
+        <div class="card wife" id="wife-3">
+          <div class="avatar f">PY</div>
+          <div class="card-name">Parmila Yadav</div>
+          <div class="card-role">Daughter-in-law</div>
+        </div>
+      </div>
+      <div class="kids-row">
+
+        <!-- Rahul – wife only -->
+        <div class="kid-col">
+          <div class="card kid" id="kid-3-1">
+            <div class="avatar m">RY</div>
+            <div class="card-name">Rahul Yadav</div>
+            <div class="card-nick">(Bhonu)</div>
+          </div>
+          <button class="expand-btn" onclick="toggleFamily('fam-rahul', this)">&#9660; Family</button>
+          <div class="family-panel" id="fam-rahul">
+            <div class="fp-vline"></div>
+            <div class="fp-inner">
+              <div class="fp-couple-row">
+                <div class="card g4">
+                  <div class="avatar m">RY</div>
+                  <div class="card-name">Rahul Yadav</div>
+                  <div class="card-role">Grandchild</div>
+                </div>
+                <div class="couple-bar"><div class="couple-line"></div><span class="heart" style="font-size:.85rem;">&#10084;</span><div class="couple-line"></div></div>
+                <div class="card g4">
+                  <div class="avatar f">W</div>
+                  <div class="card-name">Wife</div>
+                  <div class="card-role">Daughter-in-law</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rani – husband + son -->
+        <div class="kid-col">
+          <div class="card kid" id="kid-3-2">
+            <div class="avatar f">RY</div>
+            <div class="card-name">Rani Yadav</div>
+            <div class="card-role">Grandchild</div>
+          </div>
+          <button class="expand-btn" onclick="toggleFamily('fam-rani', this)">&#9660; Family</button>
+          <div class="family-panel" id="fam-rani">
+            <div class="fp-vline"></div>
+            <div class="fp-inner">
+              <div class="fp-couple-row">
+                <div class="card g4">
+                  <div class="avatar f">RY</div>
+                  <div class="card-name">Rani Yadav</div>
+                  <div class="card-role">Grandchild</div>
+                </div>
+                <div class="couple-bar"><div class="couple-line"></div><span class="heart" style="font-size:.85rem;">&#10084;</span><div class="couple-line"></div></div>
+                <div class="card g4">
+                  <div class="avatar m">H</div>
+                  <div class="card-name">Husband</div>
+                  <div class="card-role">Son-in-law</div>
+                </div>
+              </div>
+              <div class="fp-inner-vline"></div>
+              <div class="fp-kids-row">
+                <div class="card g4">
+                  <div class="avatar m">S</div>
+                  <div class="card-name">Son</div>
+                  <div class="card-role">4th Gen</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kiran – husband only -->
+        <div class="kid-col">
+          <div class="card kid" id="kid-3-3">
+            <div class="avatar f">KY</div>
+            <div class="card-name">Kiran Yadav</div>
+            <div class="card-role">Grandchild</div>
+          </div>
+          <button class="expand-btn" onclick="toggleFamily('fam-kiran', this)">&#9660; Family</button>
+          <div class="family-panel" id="fam-kiran">
+            <div class="fp-vline"></div>
+            <div class="fp-inner">
+              <div class="fp-couple-row">
+                <div class="card g4">
+                  <div class="avatar f">KY</div>
+                  <div class="card-name">Kiran Yadav</div>
+                  <div class="card-role">Grandchild</div>
+                </div>
+                <div class="couple-bar"><div class="couple-line"></div><span class="heart" style="font-size:.85rem;">&#10084;</span><div class="couple-line"></div></div>
+                <div class="card g4">
+                  <div class="avatar m">H</div>
+                  <div class="card-name">Husband</div>
+                  <div class="card-role">Son-in-law</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sachin – no family listed -->
+        <div class="kid-col">
+          <div class="card kid" id="kid-3-4">
+            <img class="avatar" src="image.jpg/sachin.jpg" style="object-fit:cover;" alt="Sachin">
+            <div class="card-name">Sachin Yadav</div>
+            <div class="card-nick">(Baluu)</div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /branch-3 -->
+
+  </div><!-- /sons-row -->
+
+</div><!-- /ftree -->
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item">
+    <div class="leg-dot" style="background:linear-gradient(135deg,#5a9fd4,#2a6090);"></div> Male
+  </div>
+  <div class="legend-item">
+    <div class="leg-dot" style="background:linear-gradient(135deg,#d47a9a,#9a3d68);"></div> Female
+  </div>
+  <div class="legend-item">
+    <div class="leg-line"></div> Family line
+  </div>
+  <div class="legend-item" style="font-size:0.72rem; color:#9a8a78;">
+    &#9660; Click "Family" to expand 4th generation
+  </div>
+</div>
+
+<!-- Lightbox overlay -->
+<div id="lightbox">
+  <span class="lb-close" id="lb-close">&times;</span>
+  <img id="lb-img" src="" alt="">
+  <div class="lb-name" id="lb-name"></div>
+</div>
+
+<script src="script.js"></script>
+<script>
+
+  /* ── SVG Tree Lines ── */
+  function drawTree() {
+    const svg   = document.getElementById('tree-lines');
+    const ftree = document.getElementById('ftree');
+    const cr    = ftree.getBoundingClientRect();
+
+    svg.setAttribute('width',  ftree.scrollWidth);
+    svg.setAttribute('height', ftree.scrollHeight);
+    svg.innerHTML = '';
+
+    function box(id) {
+      const r = document.getElementById(id).getBoundingClientRect();
+      return {
+        top:    r.top    - cr.top,
+        bottom: r.bottom - cr.top,
+        left:   r.left   - cr.left,
+        right:  r.right  - cr.left,
+        cx:     r.left   - cr.left + r.width  / 2,
+        cy:     r.top    - cr.top  + r.height / 2,
+      };
+    }
+
+    function ln(x1, y1, x2, y2) {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      el.setAttribute('x1', x1); el.setAttribute('y1', y1);
+      el.setAttribute('x2', x2); el.setAttribute('y2', y2);
+      el.setAttribute('stroke', '#c8a96e');
+      el.setAttribute('stroke-width', '2');
+      el.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(el);
+    }
+
+    /* ── Grandparents → Sons ── */
+    const gpM  = box('gp-m');
+    const gpF  = box('gp-f');
+    const gpCx = (gpM.cx + gpF.cx) / 2;
+    const gpBot = gpM.bottom;
+
+    const c1cx = (box('son-1').cx + box('wife-1').cx) / 2;
+    const c2cx = (box('son-2').cx + box('wife-2').cx) / 2;
+    const c3cx = (box('son-3').cx + box('wife-3').cx) / 2;
+    const s1top = box('son-1').top;
+    const midY1 = gpBot + (s1top - gpBot) / 2;
+
+    ln(gpCx, gpBot,  gpCx, midY1);
+    ln(c1cx, midY1, c3cx, midY1);
+    ln(c1cx, midY1, c1cx, s1top);
+    ln(c2cx, midY1, c2cx, s1top);
+    ln(c3cx, midY1, c3cx, s1top);
+
+    /* ── Each Son+Wife → their kids ── */
+    function sonToKids(sonId, wifeId, kidIds) {
+      const s    = box(sonId);
+      const w    = box(wifeId);
+      const cx   = (s.cx + w.cx) / 2;
+      const bot  = Math.max(s.bottom, w.bottom);
+      const kids = kidIds.map(box);
+      const midY = bot + (kids[0].top - bot) / 2;
+
+      ln(cx, bot,  cx, midY);
+      ln(kids[0].cx, midY, kids[kids.length-1].cx, midY);
+      kids.forEach(k => ln(k.cx, midY, k.cx, k.top));
+    }
+
+    sonToKids('son-1', 'wife-1', ['kid-1-1','kid-1-2']);
+    sonToKids('son-2', 'wife-2', ['kid-2-1','kid-2-2','kid-2-3']);
+    sonToKids('son-3', 'wife-3', ['kid-3-1','kid-3-2','kid-3-3','kid-3-4']);
+  }
+
+  window.addEventListener('load',   drawTree);
+  window.addEventListener('resize', drawTree);
+
+  /* ── Toggle expandable family panel ── */
+  function toggleFamily(panelId, btn) {
+    const panel  = document.getElementById(panelId);
+    const isOpen = panel.classList.toggle('open');
+    btn.innerHTML = isOpen ? '&#9650; Family' : '&#9660; Family';
+    btn.classList.toggle('active', isOpen);
+    /* redraw lines after DOM updates */
+    requestAnimationFrame(drawTree);
+  }
+
+  /* ── Lightbox ── */
+  const lb      = document.getElementById('lightbox');
+  const lbImg   = document.getElementById('lb-img');
+  const lbName  = document.getElementById('lb-name');
+  const lbClose = document.getElementById('lb-close');
+
+  document.querySelectorAll('img.avatar').forEach(img => {
+    img.addEventListener('click', () => {
+      lbImg.src = img.src;
+      const card = img.closest('.card');
+      lbName.textContent = card ? card.querySelector('.card-name').textContent : '';
+      lb.classList.add('open');
+    });
+  });
+
+  lb.addEventListener('click', () => lb.classList.remove('open'));
+  lbClose.addEventListener('click', () => lb.classList.remove('open'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') lb.classList.remove('open');
+  });
+</script>
+</body>
+</html>
