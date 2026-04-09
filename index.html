@@ -263,6 +263,38 @@
   #lightbox .lb-close:hover { opacity: 1; }
   img.avatar { cursor: zoom-in; }
 
+  /* ── Mobile scroll hint ── */
+  .mobile-scroll-note {
+    display: none;            /* hidden on desktop */
+  }
+  @media (max-width: 768px) {
+    .mobile-scroll-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 16px 16px;
+      padding: 10px 14px;
+      background: rgba(200,169,110,0.12);
+      border: 1px solid #c8a96e;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      color: #5a3e20;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .mobile-scroll-note span:first-child,
+    .mobile-scroll-note span:last-child {
+      font-size: 1.2rem;
+      color: #c8a96e;
+      flex-shrink: 0;
+    }
+    .mobile-scroll-note .hindi {
+      font-size: 0.75rem;
+      color: #7a6a58;
+    }
+  }
+
   /* ── Legend ── */
   .legend {
     display: flex;
@@ -372,6 +404,16 @@
 <div class="section-title">
   <h2>Family Tree</h2>
   <p>Roots that hold us &nbsp;·&nbsp; Branches that unite us</p>
+</div>
+
+<!-- Mobile scroll hint – only visible on small screens -->
+<div class="mobile-scroll-note">
+  <span>&#8598;</span>
+  <div>
+    <strong>Note:</strong> Scroll left &amp; right to see the full family tree.<br>
+    <span class="hindi">नोट: पूरा परिवार वृक्ष देखने के लिए स्क्रीन को बाएँ और दाएँ स्क्रॉल करें।</span>
+  </div>
+  <span>&#8600;</span>
 </div>
 
 <div class="tree-scroll">
