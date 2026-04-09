@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="style.css">
 <style>
 
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; width: 100%; }
   body { background: linear-gradient(135deg, #f7f3ec 0%, #eaf0e4 100%); }
 
   /* ── Hero ── */
@@ -40,7 +42,6 @@
     flex-direction: column;
     align-items: center;
     padding: 0 40px 70px;
-    overflow: visible;
   }
 
   /* SVG connector overlay */
@@ -274,6 +275,78 @@
   .legend-item { display:flex; align-items:center; gap:8px; font-size:.78rem; color:#7a6a58; }
   .leg-dot  { width:12px; height:12px; border-radius:50%; }
   .leg-line { width:28px; height:2px; background:#c8a96e; }
+
+  /* ══════════════════════════════════════════════════
+     TREE SCROLL ZONE
+     ─────────────────────────────────────────────────
+     • .tree-scroll  is exactly viewport-wide and clips
+       the tree horizontally; users swipe inside it.
+     • overflow-x: hidden is NOT put on html/body because
+       that breaks touch-scroll in child elements on iOS.
+     • Instead every non-tree section uses max-width:100%
+       + overflow:hidden so they cannot widen the page.
+  ══════════════════════════════════════════════════ */
+
+  /* Non-tree sections: lock to viewport width */
+  .hero-banner,
+  .section-title,
+  .legend {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  /* Scroll container: viewport-wide, tree scrolls inside */
+  .tree-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;   /* iOS momentum scroll */
+  }
+
+  /* Tree: always its natural full width — never shrinks */
+  #ftree {
+    width: max-content;
+    min-width: max-content;
+    margin: 0 auto;
+  }
+
+  /* ══════════════════════════════════════════════════
+     RESPONSIVE — header / title / legend only
+     The tree layout is untouched; it scrolls sideways.
+  ══════════════════════════════════════════════════ */
+  @media (max-width: 680px) {
+
+    /* Navigation bar */
+    .hero-inner {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 12px 16px 14px;
+    }
+    .hero-inner h1  { font-size: 1.1rem; }
+    .hero-inner nav { gap: 16px; flex-wrap: wrap; }
+    .hero-inner nav a { font-size: 0.84rem; }
+
+    /* Section title */
+    .section-title { padding: 14px 16px 0; }
+    .section-title h2 { font-size: 1.25rem; }
+    .section-title p  { font-size: 0.82rem; margin-bottom: 16px; }
+
+    /* Legend */
+    .legend {
+      gap: 14px;
+      margin-top: 24px;
+      padding: 0 16px 20px;
+      justify-content: center;
+    }
+    .legend-item { font-size: 0.72rem; }
+  }
+
+  @media (max-width: 380px) {
+    .hero-inner h1  { font-size: 1rem; }
+    .hero-inner nav { gap: 12px; }
+  }
 </style>
 </head>
 <body>
@@ -297,6 +370,7 @@
   <p>Roots that hold us &nbsp;·&nbsp; Branches that unite us</p>
 </div>
 
+<div class="tree-scroll">
 <div id="ftree">
 
   <!-- SVG overlay – lines drawn by JS -->
@@ -365,21 +439,21 @@
                 </div>
                 <div class="couple-bar"><div class="couple-line"></div><span class="heart" style="font-size:.85rem;">&#10084;</span><div class="couple-line"></div></div>
                 <div class="card g4">
-                  <div class="avatar m">H</div>
-                  <div class="card-name">Husband</div>
+                  <div class="avatar m">SY</div>
+                  <div class="card-name">Swapnil Yadav</div>
                   <div class="card-role">Son-in-law</div>
                 </div>
               </div>
               <div class="fp-inner-vline"></div>
               <div class="fp-kids-row">
                 <div class="card g4">
-                  <div class="avatar m">S</div>
-                  <div class="card-name">Son</div>
+                  <div class="avatar m">RY</div>
+                  <div class="card-name">Reedam Yadav</div>
                   <div class="card-role">4th Gen</div>
                 </div>
                 <div class="card g4">
-                  <div class="avatar f">D</div>
-                  <div class="card-name">Daughter</div>
+                  <div class="avatar f">DY</div>
+                  <div class="card-name">Divija Yadav</div>
                   <div class="card-role">4th Gen</div>
                 </div>
               </div>
@@ -634,6 +708,7 @@
   </div><!-- /sons-row -->
 
 </div><!-- /ftree -->
+</div><!-- /tree-scroll -->
 
 <!-- Legend -->
 <div class="legend">
@@ -739,7 +814,6 @@
     const isOpen = panel.classList.toggle('open');
     btn.innerHTML = isOpen ? '&#9650; Family' : '&#9660; Family';
     btn.classList.toggle('active', isOpen);
-    /* redraw lines after DOM updates */
     requestAnimationFrame(drawTree);
   }
 
