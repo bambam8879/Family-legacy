@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Yadav Family Legacy</title>
 <link rel="stylesheet" href="style.css">
-  <!-- Panzoom – lightweight pan & pinch-zoom library (~4 kb) -->
-  <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
 <style>
 
   *, *::before, *::after { box-sizing: border-box; }
@@ -297,18 +295,17 @@
     overflow: hidden;
   }
 
-  /* ── Panzoom container ──
-     overflow:hidden clips the panned/zoomed tree.
-     touch-action:none lets Panzoom capture all gestures
-     so pinch-zoom works on mobile without interference.   */
+  /* ── Horizontal scroll container ──
+     The tree keeps its full desktop width.
+     On narrow screens users swipe left/right inside
+     this box; the rest of the page never widens.        */
   .tree-scroll {
     width: 100%;
     max-width: 100%;
-    overflow: hidden;
-    cursor: grab;
-    user-select: none;
+    overflow-x: auto;               /* horizontal swipe on mobile  */
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch; /* smooth momentum on iOS   */
   }
-  .tree-scroll:active { cursor: grabbing; }
 
   /* Tree: always its natural full width — never shrinks */
   #ftree {
@@ -742,41 +739,26 @@
 
 <script src="script.js"></script>
 <script>
-  /* ─────────────────────────────────────────────────────
-     Panzoom – Google-Maps-style pan & pinch-zoom for the
-     family tree. The rest of the page is unaffected.
-  ───────────────────────────────────────────────────── */
-  let pz = null;   /* Panzoom instance, set on load */
 
-  /* ── SVG connector lines ──────────────────────────────
-     getBoundingClientRect() returns *screen* coordinates
-     (after any CSS transform Panzoom applied).  Dividing
-     by the current scale converts them back to the
-     element's own coordinate space, so lines always land
-     on the right cards regardless of zoom level.
-  ───────────────────────────────────────────────────── */
+  /* ── SVG connector lines ── */
   function drawTree() {
     const svg   = document.getElementById('tree-lines');
     const ftree = document.getElementById('ftree');
     const cr    = ftree.getBoundingClientRect();
-    const scale = pz ? pz.getScale() : 1;
 
-    /* SVG lives inside #ftree so its coordinate space is
-       pre-transform (scrollWidth / scrollHeight).        */
     svg.setAttribute('width',  ftree.scrollWidth);
     svg.setAttribute('height', ftree.scrollHeight);
     svg.innerHTML = '';
 
-    /* position of an element in #ftree's local space */
     function box(id) {
       const r = document.getElementById(id).getBoundingClientRect();
       return {
-        top:    (r.top    - cr.top)  / scale,
-        bottom: (r.bottom - cr.top)  / scale,
-        left:   (r.left   - cr.left) / scale,
-        right:  (r.right  - cr.left) / scale,
-        cx:     (r.left   - cr.left  + r.width  / 2) / scale,
-        cy:     (r.top    - cr.top   + r.height / 2) / scale,
+        top:    r.top    - cr.top,
+        bottom: r.bottom - cr.top,
+        left:   r.left   - cr.left,
+        right:  r.right  - cr.left,
+        cx:     r.left   - cr.left + r.width  / 2,
+        cy:     r.top    - cr.top  + r.height / 2,
       };
     }
 
@@ -791,11 +773,11 @@
     }
 
     /* grandparents → three son couples */
-    const gpM   = box('gp-m'),  gpF  = box('gp-f');
-    const gpCx  = (gpM.cx + gpF.cx) / 2;
-    const c1cx  = (box('son-1').cx + box('wife-1').cx) / 2;
-    const c2cx  = (box('son-2').cx + box('wife-2').cx) / 2;
-    const c3cx  = (box('son-3').cx + box('wife-3').cx) / 2;
+    const gpM  = box('gp-m'), gpF = box('gp-f');
+    const gpCx = (gpM.cx + gpF.cx) / 2;
+    const c1cx = (box('son-1').cx + box('wife-1').cx) / 2;
+    const c2cx = (box('son-2').cx + box('wife-2').cx) / 2;
+    const c3cx = (box('son-3').cx + box('wife-3').cx) / 2;
     const s1top = box('son-1').top;
     const midY1 = gpM.bottom + (s1top - gpM.bottom) / 2;
 
@@ -807,9 +789,9 @@
 
     /* each son+wife couple → their children */
     function sonToKids(sonId, wifeId, kidIds) {
-      const s    = box(sonId), w = box(wifeId);
-      const cx   = (s.cx + w.cx) / 2;
-      const bot  = Math.max(s.bottom, w.bottom);
+      const s   = box(sonId), w = box(wifeId);
+      const cx  = (s.cx + w.cx) / 2;
+      const bot = Math.max(s.bottom, w.bottom);
       const kids = kidIds.map(box);
       const midY = bot + (kids[0].top - bot) / 2;
       ln(cx, bot, cx, midY);
@@ -822,37 +804,7 @@
     sonToKids('son-3', 'wife-3', ['kid-3-1', 'kid-3-2', 'kid-3-3', 'kid-3-4']);
   }
 
-  /* ── Initialise Panzoom on load ── */
-  window.addEventListener('load', function () {
-    const ftree      = document.getElementById('ftree');
-    const treeScroll = document.querySelector('.tree-scroll');
-
-    /* draw lines once at natural scale before Panzoom applies any transform */
-    drawTree();
-
-    pz = Panzoom(ftree, {
-      maxScale : 4,      /* zoom in up to 4× */
-      minScale : 0.15,   /* zoom out to 15 % to see the full tree */
-      step     : 0.15,   /* wheel zoom step */
-      canvas   : true,   /* enables smooth touch/pointer handling */
-    });
-
-    /* desktop: mouse-wheel zooms on the container */
-    treeScroll.addEventListener('wheel', pz.zoomWithWheel);
-
-    /* On small screens, automatically scale the tree so it fits the
-       container width, giving a "full tree visible on load" experience. */
-    const treeW     = ftree.scrollWidth;
-    const containerW = treeScroll.clientWidth;
-    if (treeW > containerW) {
-      const initScale = Math.max((containerW / treeW) * 0.92, 0.15);
-      pz.zoom(initScale, { animate: false });
-      /* redraw lines corrected for the new scale */
-      drawTree();
-    }
-  });
-
-  /* redraw lines on window resize */
+  window.addEventListener('load',   drawTree);
   window.addEventListener('resize', drawTree);
 
   /* ── Expand / collapse 4th-generation family panels ── */
@@ -861,7 +813,6 @@
     const isOpen = panel.classList.toggle('open');
     btn.innerHTML = isOpen ? '&#9650; Family' : '&#9660; Family';
     btn.classList.toggle('active', isOpen);
-    /* wait one frame for the DOM to expand, then redraw lines */
     requestAnimationFrame(drawTree);
   }
 
